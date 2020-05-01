@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const app = express().use(bodyParser.json());
 
 app.listen(process.env.PORT || 1337, () => console.log("webhook listening"));
+
 // Creates the endpoint for our webhook 
 app.post('/webhook', (req, res) => {  
  
@@ -32,7 +33,7 @@ app.post('/webhook', (req, res) => {
 });
 
 app.get("/webhook", (req, res) => {
-    let VERIFY_TOKEN = "fuckyou";
+    let VERIFY_TOKEN = "yurikek";
     //"EAAIsbccROhkBAPJmZA0LuZCEAXiY3BJLhqbWqKxDg7KHRLYIX81NbxAZB4Q7kzkbr8T9XJega8kgFG9SEy5mpzalJyZBN4O5D4YZCO3Lvww1ZC2ZAmLYLc17ZARuuW3oGA2UM1okcu4tKIyfZA0Kr49ynsbJtj45LvkfXFr3BCnpFXAZDZD";
     let mode = req.query['hub.mode'];
     let token = req.query['hub.verify_token'];
