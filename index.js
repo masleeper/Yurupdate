@@ -10,7 +10,9 @@ app.listen(process.env.PORT || 1337, () => console.log("webhook listening"));
 app.post('/webhook', (req, res) => {  
  
     let body = req.body;
-  
+
+    console.log(body);
+    
     // Checks this is an event from a page subscription
     if (body.object === 'page') {
   
@@ -48,3 +50,18 @@ app.get("/webhook", (req, res) => {
         }
     }
 });
+
+// handle message events
+function handlemsg(sender_psid, received_message) {
+
+}
+
+// handle message postback events
+function handlePostback(sender_psid, received_postback) {
+
+}
+
+// send response
+function callSendAPI(sender_psid, response) {
+
+}
