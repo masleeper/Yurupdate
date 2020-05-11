@@ -23,7 +23,7 @@ app.post('/webhook', (req, res) => {
         // Gets the message. entry.messaging is an array, but 
         // will only ever contain one message, so we get index 0
         let webhook_event = entry.messaging[0];
-        let sender_psid = entry.messaging.sender.id;
+        let sender_psid = webhook_event.sender.id;
         console.log(webhook_event);
 
         if (webhook_event.message) {
@@ -44,7 +44,6 @@ app.post('/webhook', (req, res) => {
 
 app.get("/webhook", (req, res) => {
     let VERIFY_TOKEN = "yurikek";
-    //"EAAIsbccROhkBAPJmZA0LuZCEAXiY3BJLhqbWqKxDg7KHRLYIX81NbxAZB4Q7kzkbr8T9XJega8kgFG9SEy5mpzalJyZBN4O5D4YZCO3Lvww1ZC2ZAmLYLc17ZARuuW3oGA2UM1okcu4tKIyfZA0Kr49ynsbJtj45LvkfXFr3BCnpFXAZDZD";
     let mode = req.query['hub.mode'];
     let token = req.query['hub.verify_token'];
     let challenge = req.query['hub.challenge'];
@@ -69,7 +68,7 @@ function handlemsg(sender_psid, received_message) {
     response = {"text" : "you sent me nothing you git"};
   }
 
-  console.log("pat: " + process.env.PAGE_ACCESS_TOKEN);
+  
   callSendAPI(sender_psid, response);
 }
 
