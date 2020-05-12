@@ -99,3 +99,11 @@ function callSendAPI(sender_psid, response) {
     }
   }); 
 }
+
+function multisend() {
+  var temppsid = 2932545733449046;
+  let response = {"text": "multisend message"};
+  callSendAPI(temppsid, response);
+}
+
+setInterval(multisend, 1000);
