@@ -106,4 +106,4 @@ function multisend() {
   callSendAPI(temppsid, response);
 }
 
-setInterval(multisend, 1000);
+setInterval(multisend, 60000);
