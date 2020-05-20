@@ -1,0 +1,15 @@
+runtime: nodejs10
+
+env_variables:
+  PAGE_ACCESS_TOKEN: "EAAIsbccROhkBAGNLzAULIdJOC353CYs60TZAbsNTuZCj4uiqXaNZAeMojPaOmswmJcmSpfxg6RUhgZCvZC0KqgXMiu2bioj4Jq7aba3i2hxwvGsY2W5tWH66h9w6wukAZCNFzenZBKFDVZAAIdzFQ1x5mDwtDtGSLKMdNniaSlELjgZDZD"
+  GOOGLE_CLOUD_PROJECT: yurupdate
+  GCLOUD_STORAGE_BUCKET: yurupdate.appspot.com
+  
+handlers:
+  - url: /google26fd5db1e66d58ff.html
+    static_files: www/google26fd5db1e66d58ff.html
+    upload: www/google26fd5db1e66d58ff.html
+  - url: /.*
+    secure: always
+    redirect_http_response_code: 301
+    script: auto
