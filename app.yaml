@@ -3,6 +3,9 @@ runtime: nodejs10
 env_variables:
   GOOGLE_CLOUD_PROJECT: yurupdate
   GCLOUD_STORAGE_BUCKET: yurupdate.appspot.com
+
+manual_scaling:
+  instances: 1
   
 handlers:
   - url: /google26fd5db1e66d58ff.html
