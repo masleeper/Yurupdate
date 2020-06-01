@@ -1,1 +1,6 @@
 node_modules/
+client_id.json
+token.json
+discordbot.json
+.env
+www/*
