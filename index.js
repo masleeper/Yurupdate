@@ -23,6 +23,9 @@ const drive = google.drive({version: 'v3', oAuth2Client});
 const fileId = "18xVLgwhixugbfBVQBO_67aRre4vrr4mAJMAV-y4PCJ8";
 
 var lastMsgSend = 0;
+getLastRevisionTime().then((res) => {
+  lastMsgSend = new Date(res);
+});
 
 // write new token to file on refresh
 oAuth2Client.on("tokens", (token) => {
@@ -45,6 +48,7 @@ setInterval(renewPush, 60000*60);
 // start up discord bot
 discordClient.login(discordToken);
 var channel = "";
+var editUser;
 discordClient.on("ready", () => { 
   console.log(`Discord bot started under user ${discordClient.user.tag}`);
   discordClient.channels.cache.forEach((entry) => {
@@ -52,11 +56,27 @@ discordClient.on("ready", () => {
       channel = discordClient.channels.cache.get(entry.id);
     }
   });
+
+  editUser = discordClient.users.cache.get("187632415458590720");
 });
 
 discordClient.on("message", (msg) => {
   if (msg.content == "hello") {
     msg.reply("bye");
+  } else if (msg.content == "!help") {
+    var cmdlist = "\nCommand List\n" +
+                  "!last - last update time\n" +
+                  "!edit - who to get edit permissions from for the google doc\n" +
+                  "!doc - document link\n" ;
+    msg.reply(cmdlist);
+  } else if (msg.content == "!last") {
+    // not necessarily true update time, but close enough for users
+    var dateStr = lastMsgSend.toLocaleString("en-US", {timeZone: "America/Denver"}) + " Mountain Time";
+    msg.reply(dateStr);
+  } else if (msg.content == "!edit") {
+    msg.reply(`Contact ${editUser} for document edit permissions for the google doc`);
+  } else if (msg.content == "!doc") {
+    msg.reply("https://docs.google.com/document/d/18xVLgwhixugbfBVQBO_67aRre4vrr4mAJMAV-y4PCJ8/edit?usp=sharing");
   }
 });
 
@@ -70,12 +90,11 @@ app.get("/", (req, res) => {
 // Endpoint for Google Drive push notifications
 app.post("/notifications", (req, res) => {
   console.log("PUSH NOTIFICATION RECEIVED");
-  
   console.log(req.get("x-goog-resource-state"));
   if (req.get("x-goog-resource-state") == "update") {
     if (req.get("x-goog-changed").includes("content")) {
       console.log("Possible update detected...");
-      var now = Date.now();
+      var now = new Date();
       getLastRevisionTime().then((res) => {
         var revTime = Date.parse(res);
         var timeDiff = (now - revTime) / 1000;
