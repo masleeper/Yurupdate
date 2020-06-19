@@ -21,6 +21,9 @@ oAuth2Client.setCredentials({
 });
 const drive = google.drive({version: 'v3', oAuth2Client});
 const fileId = "18xVLgwhixugbfBVQBO_67aRre4vrr4mAJMAV-y4PCJ8";
+const refreshMargin = 60 * 10; // time in seconds that new update message won't be sent after previous one
+var channels = [];
+var editUser;
 
 var lastMsgSend = 0;
 getLastRevisionTime().then((res) => {
@@ -47,13 +50,11 @@ setInterval(renewPush, 60000*60);
 
 // start up discord bot
 discordClient.login(discordToken);
-var channel = "";
-var editUser;
 discordClient.on("ready", () => { 
   console.log(`Discord bot started under user ${discordClient.user.tag}`);
   discordClient.channels.cache.forEach((entry) => {
     if (entry.type == "text" && entry.name == "yurupdate") {
-      channel = discordClient.channels.cache.get(entry.id);
+      channels.push(discordClient.channels.cache.get(entry.id));
     }
   });
 
@@ -98,14 +99,16 @@ app.post("/notifications", (req, res) => {
       getLastRevisionTime().then((res) => {
         var revTime = Date.parse(res);
         var timeDiff = (now - revTime) / 1000;
-        if (timeDiff < 180) {
+        console.log(timeDiff);
+        console.log(refreshMargin);
+        if (timeDiff < refreshMargin) {
           console.log("Update confirmed");
           if (lastMsgSend == 0) {
             lastMsgSend = now;
             sendUpdateMsg();
           } else {
             var lstMsgTimeDiff = (now - lastMsgSend) / 1000;
-            if (lstMsgTimeDiff > 180 ) {
+            if (lstMsgTimeDiff > refreshMargin ) {
               lastMsgSend = now;
               sendUpdateMsg();
             } else {
@@ -173,6 +176,9 @@ async function getLastRevisionTime() {
 }
 
 function sendUpdateMsg() {
-  channel.send("A update has occurred. Check the update at https://docs.google.com/document/d/18xVLgwhixugbfBVQBO_67aRre4vrr4mAJMAV-y4PCJ8/edit?usp=sharing");
+  var message = "A update has occurred. Check the update at https://docs.google.com/document/d/18xVLgwhixugbfBVQBO_67aRre4vrr4mAJMAV-y4PCJ8/edit?usp=sharing";
+  channels.forEach((channel) => {
+    channel.send(message)
+  });
   console.log("UPDATE MESSAGE SENT");
 }
