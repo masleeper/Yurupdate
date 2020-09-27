@@ -121,6 +121,7 @@ app.post("/notifications", (req, res) => {
       });
     }
   }
+  res.status(200).end();
 });
 
 
