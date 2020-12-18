@@ -84,6 +84,8 @@ app.get("/", (req, res) => {
   res.status(200).send("blank").end();
 });
 
+// function to check if google doc has updated 
+// within margin to send message
 function checkUpdate() {
   var now = new Date();
   getLastRevisionTime().then((res) => {
@@ -101,7 +103,6 @@ function checkUpdate() {
         if (lstMsgTimeDiff > refreshMargin ) {
           lastMsgSend = now;
           sendUpdateMsg();
-          console.log("UPDATE NOW FUCKER")
         } else {
           console.log("Message not sent, too soon since last message");
         }
@@ -134,7 +135,7 @@ async function getLastRevisionTime() {
 }
 
 function sendUpdateMsg() {
-  var message = "Test message, all users disregard";// "A update has occurred. Check the update at https://docs.google.com/document/d/18xVLgwhixugbfBVQBO_67aRre4vrr4mAJMAV-y4PCJ8/edit?usp=sharing";
+  var message = "A update has occurred. Check the update at https://docs.google.com/document/d/18xVLgwhixugbfBVQBO_67aRre4vrr4mAJMAV-y4PCJ8/edit?usp=sharing";
   channels.forEach((channel) => {
     channel.send(message)
   });
