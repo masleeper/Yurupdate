@@ -43,11 +43,7 @@ oAuth2Client.on("tokens", (token) => {
 
 app.listen(process.env.PORT || 1337, () => console.log("SERVER STARTING"));
 
-// renew push notifactions
-renewPush();
-// renew watch request every hour
-setInterval(renewPush, 60000*60);
-
+setInterval(checkUpdate, 1000)
 // start up discord bot
 discordClient.login(discordToken);
 discordClient.on("ready", () => { 
@@ -88,46 +84,33 @@ app.get("/", (req, res) => {
   res.status(200).send("blank").end();
 });
 
-// Endpoint for Google Drive push notifications
-app.post("/notifications", (req, res) => {
-  console.log("PUSH NOTIFICATION RECEIVED");
-  console.log(req.get("x-goog-resource-state"));
-  if (req.get("x-goog-resource-state") == "update") {
-    if (req.get("x-goog-changed").includes("content")) {
-      console.log("Possible update detected...");
-      var now = new Date();
-      getLastRevisionTime().then((res) => {
-        var revTime = Date.parse(res);
-        var timeDiff = (now - revTime) / 1000;
-        console.log(timeDiff);
-        console.log(refreshMargin);
-        if (timeDiff < refreshMargin) {
-          console.log("Update confirmed");
-          if (lastMsgSend == 0) {
-            lastMsgSend = now;
-            sendUpdateMsg();
-          } else {
-            var lstMsgTimeDiff = (now - lastMsgSend) / 1000;
-            if (lstMsgTimeDiff > refreshMargin ) {
-              lastMsgSend = now;
-              sendUpdateMsg();
-            } else {
-              console.log("Message not sent, too soon since last message");
-            }
-          }
+function checkUpdate() {
+  var now = new Date();
+  getLastRevisionTime().then((res) => {
+    var revTime = Date.parse(res);
+    var timeDiff = (now - revTime) / 1000;
+    console.log(timeDiff);
+    console.log(refreshMargin);
+    if (timeDiff < refreshMargin) {
+      console.log("Update confirmed");
+      if (lastMsgSend == 0) {
+        lastMsgSend = now;
+        sendUpdateMsg();
+      } else {
+        var lstMsgTimeDiff = (now - lastMsgSend) / 1000;
+        if (lstMsgTimeDiff > refreshMargin ) {
+          lastMsgSend = now;
+          sendUpdateMsg();
+          console.log("UPDATE NOW FUCKER")
         } else {
-          console.log("Update not detected, just Google mucking with stuff");
+          console.log("Message not sent, too soon since last message");
         }
-      });
+      }
+    } else {
+      console.log("Update not within margin");
     }
-  }
-  res.status(200).end();
-});
-
-
-app.get("/notifications", (req, res) => {
-  res.status(200).send("notif").end();
-});
+  });
+}
 
 // drive auth functions
 async function authorize() {
@@ -135,35 +118,9 @@ async function authorize() {
   fs.readFile(TOKEN_PATH, (err, token) => {
     if (err) return console.log("Error reading token file");
     oAuth2Client.setCredentials(JSON.parse(token));
-    driveWatchRequest(oAuth2Client);
   });
 }
 
-async function driveWatchRequest(client) {
-  const {token} = await client.getAccessToken();
-  var reqbody = { 
-      "id": "yurikek",
-      "type": "web_hook",
-      "address": "https://yurupdate.wm.r.appspot.com/notifications"
-  }
-  request({
-      url: "https://www.googleapis.com/drive/v3/files/18xVLgwhixugbfBVQBO_67aRre4vrr4mAJMAV-y4PCJ8/watch", 
-      method: "POST",
-      headers: {
-          "Authorization": "Bearer " + token,
-          "Content-Type": "application/json"
-      },
-      json: reqbody
-  }, (err, res, body) => {
-      if (!err) {
-          console.log(body);
-      }
-  });
-}
-
-function renewPush() {
-  authorize();
-}
 
 async function getLastRevisionTime() {
   const res = await drive.revisions.list({
@@ -177,7 +134,7 @@ async function getLastRevisionTime() {
 }
 
 function sendUpdateMsg() {
-  var message = "A update has occurred. Check the update at https://docs.google.com/document/d/18xVLgwhixugbfBVQBO_67aRre4vrr4mAJMAV-y4PCJ8/edit?usp=sharing";
+  var message = "Test message, all users disregard";// "A update has occurred. Check the update at https://docs.google.com/document/d/18xVLgwhixugbfBVQBO_67aRre4vrr4mAJMAV-y4PCJ8/edit?usp=sharing";
   channels.forEach((channel) => {
     channel.send(message)
   });
