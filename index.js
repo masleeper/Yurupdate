@@ -26,9 +26,13 @@ var channels = [];
 var editUser;
 
 var lastMsgSend = 0;
-getLastRevisionTime().then((res) => {
-  lastMsgSend = new Date(res);
-});
+getLastRevisionTime()
+  .then((res) => {
+    lastMsgSend = new Date(res);
+  })
+  .catch(err => {
+    console.log("Error doing API call");
+  });
 
 // write new token to file on refresh
 oAuth2Client.on("tokens", (token) => {
@@ -110,6 +114,9 @@ function checkUpdate() {
     } else {
       console.log("Update not within margin");
     }
+  }).catch(err => {
+    console.log("Error doing API call");
+    // console.log(err);
   });
 }
 
